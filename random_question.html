@@ -1,0 +1,76 @@
+
+
+<!DOCTYPE html>
+<html>
+<body>
+<div id="main"></div>
+
+<script>
+
+function shuffleArray(d) {
+  for (var c = d.length - 1; c > 0; c--) {
+    var b = Math.floor(Math.random() * (c + 1));
+    var a = d[c];
+    d[c] = d[b];
+    d[b] = a;
+  }
+  return d;
+};
+
+var current_answer = null;
+
+function score(){
+  x = document.querySelector('input[name="answer"]:checked').value;
+  if(current_answer == x){alert(x+"is the correct answer!")}
+  else{alert(x+"is not the correct answer  :(")}
+}
+
+var Q1 = {
+  question_text : "you flip a fair coin {n} times. It is equally likely to show either heads or tails on any given flip. What is the mean number of heads observed?",
+  n : Math.floor( Math.random() * 5 )+5,
+  output_question : function() {
+    return this.question_text.replace("{n}",String(this.n))
+  },
+  answer : function() {
+    var a = this.n*0.5;
+    return String(Math.round(a*1000.0)/1000.0);
+  },
+  distractor1 : function() {
+    var d1 = this.n*0.5*0.5;
+    return String(Math.round(d1*1000.0)/1000.0);
+  },
+  distractor2 : function() {
+    var d2 = Math.sqrt(this.n*0.5*0.5);
+    return String(Math.round(d2*1000.0)/1000.0);
+  },
+  distractor3 : function() {
+    var d3 = 0.5;
+    return String(Math.round(d3*1000.0)/1000.0);
+  },
+  random_answer_array : function(){
+    var arr = [this.answer(), this.distractor1(), this.distractor2(), this.distractor3()];
+    return shuffleArray(arr)
+  },
+  show_item : function(){
+    raa = this.random_answer_array();
+    temp = "<p>";
+    temp += this.output_question();
+    temp += "</p>";
+    temp += '<input type="radio" id="'+String(raa[0])+'" name="answer" value="'+String(raa[0])+'"><label>'+String(raa[0])+'</label><br>';
+    temp += '<input type="radio" id="'+String(raa[1])+'" name="answer" value="'+String(raa[1])+'"><label>'+String(raa[1])+'</label><br>';
+    temp += '<input type="radio" id="'+String(raa[2])+'" name="answer" value="'+String(raa[2])+'"><label>'+String(raa[2])+'</label><br>';
+    temp += '<input type="radio" id="'+String(raa[3])+'" name="answer" value="'+String(raa[3])+'"><label>'+String(raa[3])+'</label><br>';
+    temp += '<button type="button" name="button" onclick="score();">SUBMIT</button>';
+    temp += '<br>';
+    document.getElementById('main').innerHTML = temp;
+    current_answer = this.answer();
+  }
+};
+
+
+
+Q1.show_item();
+</script>
+
+</body>
+</html>
