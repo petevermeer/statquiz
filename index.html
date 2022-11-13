@@ -2,10 +2,27 @@
 
 <!DOCTYPE html>
 <html>
+<head>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+    }
+  </style>
+</head>
 <body>
+<div id="slos">
+<ul>
+  <h3>Chapter 1</h3>
+  <li><a href="#" onclick="printQuestion(sample_mean);">calculate mean of a small dataset</a></li>
+  <h3>Chapter 5</h3>
+  <li><a href="#" onclick="printQuestion(disc_mean);">calculate mean of a discrete probability distribution</a></li>
+  <li><a href="#" onclick="printQuestion(binom_mean);">calculate mean of a binomial distribution</a></li>
+</ul>
+</div>
 <div id="main"></div>
 
 <script>
+//utility functions
 
 function shuffleArray(d) {
   for (var c = d.length - 1; c > 0; c--) {
@@ -17,60 +34,161 @@ function shuffleArray(d) {
   return d;
 };
 
-var current_answer = null;
-
 function score(){
   x = document.querySelector('input[name="answer"]:checked').value;
   if(current_answer == x){alert(x+"is the correct answer!")}
   else{alert(x+"is not the correct answer  :(")}
 }
 
-var Q1 = {
-  question_text : "you flip a fair coin {n} times. It is equally likely to show either heads or tails on any given flip. What is the mean number of heads observed?",
-  n : Math.floor( Math.random() * 5 )+5,
-  output_question : function() {
-    return this.question_text.replace("{n}",String(this.n))
-  },
-  answer : function() {
-    var a = this.n*0.5;
-    return String(Math.round(a*1000.0)/1000.0);
-  },
-  distractor1 : function() {
-    var d1 = this.n*0.5*0.5;
-    return String(Math.round(d1*1000.0)/1000.0);
-  },
-  distractor2 : function() {
-    var d2 = Math.sqrt(this.n*0.5*0.5);
-    return String(Math.round(d2*1000.0)/1000.0);
-  },
-  distractor3 : function() {
-    var d3 = 0.5;
-    return String(Math.round(d3*1000.0)/1000.0);
-  },
-  random_answer_array : function(){
-    var arr = [this.answer(), this.distractor1(), this.distractor2(), this.distractor3()];
-    return shuffleArray(arr)
-  },
-  show_item : function(){
-    raa = this.random_answer_array();
-    temp = "<p>";
-    temp += this.output_question();
-    temp += "</p>";
-    temp += '<input type="radio" id="'+String(raa[0])+'" name="answer" value="'+String(raa[0])+'"><label>'+String(raa[0])+'</label><br>';
-    temp += '<input type="radio" id="'+String(raa[1])+'" name="answer" value="'+String(raa[1])+'"><label>'+String(raa[1])+'</label><br>';
-    temp += '<input type="radio" id="'+String(raa[2])+'" name="answer" value="'+String(raa[2])+'"><label>'+String(raa[2])+'</label><br>';
-    temp += '<input type="radio" id="'+String(raa[3])+'" name="answer" value="'+String(raa[3])+'"><label>'+String(raa[3])+'</label><br>';
-    temp += '<button type="button" name="button" onclick="score();">SUBMIT</button>';
-    temp += '<br>';
-    document.getElementById('main').innerHTML = temp;
-    current_answer = this.answer();
-  }
+function roundTo3(x){
+  return String(Math.round(x*1000.0)/1000.0);
+}
+
+function printQuestion(question){
+  question.assign_variables();
+  var raa = [question.answer(), question.distractor1(), question.distractor2(), question.distractor3()];
+  raa = shuffleArray(raa);
+  var temp = "<p>";
+  temp += question.output_question();
+  temp += "</p>";
+  temp += '<input type="radio" id="'+String(raa[0])+'" name="answer" value="'+String(raa[0])+'"><label>'+String(raa[0])+'</label><br>';
+  temp += '<input type="radio" id="'+String(raa[1])+'" name="answer" value="'+String(raa[1])+'"><label>'+String(raa[1])+'</label><br>';
+  temp += '<input type="radio" id="'+String(raa[2])+'" name="answer" value="'+String(raa[2])+'"><label>'+String(raa[2])+'</label><br>';
+  temp += '<input type="radio" id="'+String(raa[3])+'" name="answer" value="'+String(raa[3])+'"><label>'+String(raa[3])+'</label><br>';
+  temp += '<button type="button" name="button" onclick="score();">SUBMIT</button>';
+  temp += '<br>';
+  document.getElementById('main').innerHTML = temp;
+  current_answer = question.answer();
+}
+
+//statistics utils
+
+function median(values){
+  if(values.length ===0) throw new Error("No inputs");
+  values.sort(function(a,b){
+    return a-b;
+  });
+  var half = Math.floor(values.length / 2);
+  if (values.length % 2)
+    return values[half];
+  return (values[half - 1] + values[half]) / 2.0;
+}
+
+//model
+
+var current_answer = null;
+
+//questions
+
+var binom_mean = {
+    question_text : "You flip a fair coin {n} times. It is equally likely to show either heads or tails on any given flip. What is the mean number of heads observed?",
+    slo:"calculate mean of a binomial distribution",
+    output_question : function() {
+      return this.question_text.replace("{n}",String(this.n))
+    },
+    assign_variables: function(){
+      this.n = Math.floor( Math.random() * 5 )+5;
+    },
+    answer : function() {
+      var a = this.n*0.5;
+      return String(Math.round(a*1000.0)/1000.0);
+    },
+    distractor1 : function() {
+      var d1 = this.n*0.5*0.5;
+      return String(Math.round(d1*1000.0)/1000.0);
+    },
+    distractor2 : function() {
+      var d2 = Math.sqrt(this.n*0.5*0.5);
+      return String(Math.round(d2*1000.0)/1000.0);
+    },
+    distractor3 : function() {
+      var d3 = 0.5;
+      return String(Math.round(d3*1000.0)/1000.0);
+    }
+  };
+
+var disc_mean = {
+    question_text : "given a discrete probability distribution defined by the table below calculate the mean:<table><tr><td>x</td><td>p(x)</td></tr><tr><td>{x1}</td><td>{p1}</td></tr><tr><td>{x2}</td><td>{p2}</td></tr><tr><td>{x3}</td><td>{p3}</td></tr></table><br>",
+    slo:"calculate mean of a discrete probability distribution",
+    assign_variables: function(){
+      this.x1 = Math.floor( Math.random() * 10 )-5;
+      this.x2 = this.x1 + Math.floor( Math.random() * 5)+1;
+      this.x3 = this.x2 + Math.floor( Math.random() * 5)+1;
+      this.p1 = Math.floor( Math.random() * 50 )/100.0;
+      this.p2 = Math.floor( Math.random() * 30 )/100.0;
+      this.p3 = roundTo3(1.0 - this.p2 - this.p1);
+    },
+    output_question : function() {
+      temp = this.question_text;
+      temp = temp.replace("{x1}",String(this.x1));
+      temp = temp.replace("{x2}",String(this.x2));
+      temp = temp.replace("{x3}",String(this.x3));
+      temp = temp.replace("{p1}",String(this.p1));
+      temp = temp.replace("{p2}",String(this.p2));
+      temp = temp.replace("{p3}",String(this.p3));
+      return temp;
+    },
+    answer : function() {
+      var a = this.x1*this.p1+this.x2*this.p2+this.x3*this.p3;
+      return String(Math.round(a*1000.0)/1000.0);
+    },
+    distractor1 : function() {
+      var d1 = (this.x1+this.x2+this.x3)/3.0;
+      return String(Math.round(d1*1000.0)/1000.0);
+    },
+    distractor2 : function() {
+      var d2 = 1.0/3.0;
+      return String(Math.round(d2*1000.0)/1000.0);
+    },
+    distractor3 : function() {
+      var d3 = this.x1/this.p1+this.x2/this.p2+this.x3/this.p3
+      return String(Math.round(d3*1000.0)/1000.0);
+    }
 };
 
+var sample_mean = {
+    question_text : "Calculate the mean of the following sample:{{x1},{x2},{x3},{x4},{x5}}",
+    slo:"calculate mean of a small dataset",
+    assign_variables: function(){
+      this.x1 = Math.floor( Math.random() * 10 )-5;
+      this.x2 = Math.floor( Math.random() * 10 )-5;
+      this.x3 = Math.floor( Math.random() * 10 )-5;
+      this.x4 = Math.floor( Math.random() * 10 )-5;
+      this.x5 = Math.floor( Math.random() * 10 )-5;
+    },
+    output_question : function() {
+      temp = this.question_text;
+      temp = temp.replace("{x1}",String(this.x1));
+      temp = temp.replace("{x2}",String(this.x2));
+      temp = temp.replace("{x3}",String(this.x3));
+      temp = temp.replace("{x4}",String(this.x4));
+      temp = temp.replace("{x5}",String(this.x5));
+      return temp;
+    },
+    answer : function() {
+      var a = (this.x1+this.x2+this.x3+this.x4+this.x5)/5;
+      return String(Math.round(a*1000.0)/1000.0);
+    },
+    distractor1 : function() {
+      var arr = [this.x1,this.x2,this.x3,this.x4,this.x5];
+      var d1 = median(arr);
+      return String(Math.round(d1*1000.0)/1000.0);
+    },
+    distractor2 : function() {
+      var d2 = Math.min(this.x1,this.x2,this.x3,this.x4,this.x5);
+      return String(Math.round(d2*1000.0)/1000.0);
+    },
+    distractor3 : function() {
+      var d3 = this.x1+this.x2+this.x3+this.x4+this.x5;
+      return String(Math.round(d3*1000.0)/1000.0);
+    }
+};
 
+printQuestion(sample_mean);
 
-Q1.show_item();
 </script>
+
+
 
 </body>
 </html>
